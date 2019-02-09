@@ -300,7 +300,7 @@ static NSString *Resources;
     
     // remove the files in the DEB from the filesystem
     for (int i = 0; i < files.count; i++) {
-        NSArray *blacklist = @[@"/var/LIB/Library", @"/var/LIB/PreferenceLoader", @"/var/LIB/Frameworks", @"/var/LIB/MobileSubstrate", @"/var/LIB/MobileSubstrate/DynamicLibraries", @"/var/LIB/TweakInject", @"/var/LIB/LaunchDaemons", @"/var/LIB/PreferenceBundles", @"/var/LIB/PreferenceLoader/Preferences", @"/var/LIB", @"/var"];
+        NSArray *blacklist = @[@"/var/LIB/Library", @"/var/LIB/PreferenceLoader", @"/var/LIB/Frameworks", @"/var/LIB/MobileSubstrate", @"/var/LIB/MobileSubstrate/DynamicLibraries", @"/var/LIB/TweakInject", @"/var/LIB/LaunchDaemons", @"/var/LIB/PreferenceBundles", @"/var/LIB/PreferenceLoader/Preferences", @"/var/LIB/LaunchDaemons", @"/var/LIB/Frameworks", @"/var/LIB/TweakInject", @"/var/LIB", @"/var"];
         NSString *to = (NSString *)[files objectAtIndex:i];
         
         // make sure we don't delete important things
