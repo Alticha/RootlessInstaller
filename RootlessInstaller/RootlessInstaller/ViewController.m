@@ -304,13 +304,14 @@ static NSString *Resources;
         NSString *to = (NSString *)[files objectAtIndex:i];
         
         // make sure we don't delete important things
+        bool remove = true;
         for (NSString *str in blacklist) {
             if ([to isEqual:str] || [to isEqual:[str stringByAppendingString:@"/"]]) {
-                continue;
+                remove = false;
             }
         }
         
-        if ([[NSFileManager defaultManager] fileExistsAtPath:to]) [[NSFileManager defaultManager] removeItemAtPath:to error:nil]; // delete the file/directory
+        if (remove && [[NSFileManager defaultManager] fileExistsAtPath:to]) [[NSFileManager defaultManager] removeItemAtPath:to error:nil]; // delete the file/directory
     }
     
     // idk fix a crash
