@@ -1,5 +1,3 @@
-//  Wrapper for libarchive by Sam Binger
-
 //
 //  Archive.m
 //
@@ -10,6 +8,9 @@
 #import "ArchiveFile.h"
 #import "archive.h"
 #import "archive_entry.h"
+
+#define DEFAULT_FLAGS (ARCHIVE_EXTRACT_TIME|ARCHIVE_EXTRACT_PERM|ARCHIVE_EXTRACT_ACL| \
+ARCHIVE_EXTRACT_FFLAGS|ARCHIVE_EXTRACT_OWNER|ARCHIVE_EXTRACT_UNLINK)
 
 static int
 copy_data(struct archive *ar, struct archive *aw)
@@ -37,6 +38,24 @@ copy_data(struct archive *ar, struct archive *aw)
     int _fd;
     BOOL _hasReadFiles;
     BOOL _isPipe;
+}
+
++(ArchiveFile*)archiveWithFile:(NSString *)filename
+{
+#if __has_feature(objc_arc)
+    return [[ArchiveFile alloc] initWithFile:filename];
+#else
+    return [[[ArchiveFile alloc] initWithFile:filename] autorelease];
+#endif
+}
+
++(ArchiveFile*)archiveWithFd:(int)fd
+{
+#if __has_feature(objc_arc)
+    return [[ArchiveFile alloc] initWithFd:fd];
+#else
+    return [[[ArchiveFile alloc] initWithFd:fd] autorelease];
+#endif
 }
 
 -(void)readContents
@@ -74,7 +93,7 @@ copy_data(struct archive *ar, struct archive *aw)
     self = [self init];
     _files = nil;
     _hasReadFiles = NO;
-
+    
     _fd = open(filename.UTF8String, O_RDONLY);
     if (_fd < 0) {
         perror("Archive open file returned error");
@@ -86,11 +105,11 @@ copy_data(struct archive *ar, struct archive *aw)
     archive_read_support_format_all(a);
     if (archive_read_open_fd(a, _fd, 16384) != ARCHIVE_OK)
         return nil;
-
+    
     archive_read_close(a);
     archive_read_finish(a);
     lseek(_fd, 0, SEEK_SET);
-
+    
     return self;
 }
 
@@ -157,7 +176,66 @@ copy_data(struct archive *ar, struct archive *aw)
         if (rv < ARCHIVE_WARN)
             goto out;
     }
-        
+    
+    if (archive_entry_size(entry) > 0) {
+        rv = archive_read_data_into_fd(a, fd);
+    }
+    if (rv < ARCHIVE_OK) {
+        NSLog(@"Archive: %s", archive_error_string(a));
+        if (rv < ARCHIVE_WARN)
+            goto out;
+    }
+    result = YES;
+    out:
+    archive_read_close(a);
+    archive_read_finish(a);
+    close(fd);
+    return result;
+}
+
+-(BOOL)extract:(NSString*)file toFd:(int)fd
+{
+    BOOL result = NO;
+    /* Select which attributes we want to restore. */
+    
+    if (fd < 0) {
+        NSLog(@"Archive: invalid fd");
+        return NO;
+    }
+    
+    struct archive *a = archive_read_new();
+    archive_read_support_compression_all(a);
+    archive_read_support_format_all(a);
+    
+    if (archive_read_open_fd(a, _fd, 16384) != ARCHIVE_OK) {
+        NSLog(@"Archive: unable to archive_read_open_fd: %s", archive_error_string(a));
+        close(fd);
+        return result;
+    }
+    
+    // Seek to entry
+    struct archive_entry *entry = NULL;
+    int rv;
+    while ((rv = archive_read_next_header(a, &entry)) == ARCHIVE_OK &&
+           strcmp(archive_entry_pathname(entry), file.UTF8String) != 0
+           );
+    
+    if (rv == ARCHIVE_EOF) {
+        NSLog(@"Archive: no such file \"%@\"", file);
+        goto out;
+    }
+    
+    if (rv < ARCHIVE_OK) {
+        NSLog(@"Archive: %s", archive_error_string(a));
+        if (rv < ARCHIVE_WARN)
+            goto out;
+    }
+    
+    if (entry && (strcmp(archive_entry_pathname(entry), file.UTF8String) != 0) ) {
+        NSLog(@"Archive: Unable to find entry for %@", file);
+        goto out;
+    }
+    
     if (archive_entry_size(entry) > 0) {
         rv = archive_read_data_into_fd(a, fd);
     }
@@ -185,7 +263,7 @@ copy_data(struct archive *ar, struct archive *aw)
         NSLog(@"Archive: unable to dupe fd");
         return NO;
     }
-
+    
     struct archive *a = archive_read_new();
     archive_read_support_compression_all(a);
     archive_read_support_format_all(a);
@@ -195,7 +273,7 @@ copy_data(struct archive *ar, struct archive *aw)
         close(fd);
         return result;
     }
-
+    
     struct archive *ext = archive_write_disk_new();
     archive_write_disk_set_options(ext, flags);
     
@@ -205,12 +283,12 @@ copy_data(struct archive *ar, struct archive *aw)
     while ((rv = archive_read_next_header(a, &entry)) == ARCHIVE_OK &&
            strcmp(archive_entry_pathname(entry), file.UTF8String) != 0
            );
-
+    
     if (rv == ARCHIVE_EOF) {
         NSLog(@"Archive: no such file \"%@\"", file);
         goto out;
     }
-
+    
     if (rv < ARCHIVE_OK) {
         NSLog(@"Archive: %s", archive_error_string(a));
         if (rv < ARCHIVE_WARN)
@@ -237,7 +315,7 @@ copy_data(struct archive *ar, struct archive *aw)
                 goto out;
         }
     }
-
+    
     rv = archive_write_finish_entry(ext);
     if (rv < ARCHIVE_OK) {
         NSLog(@"Archive: %s", archive_error_string(ext));
@@ -245,7 +323,7 @@ copy_data(struct archive *ar, struct archive *aw)
             goto out;
     }
     result = YES;
-out:
+    out:
     archive_write_close(ext);
     archive_write_finish(ext);
     archive_read_close(a);
@@ -254,10 +332,35 @@ out:
     return result;
 }
 
+-(BOOL)extract
+{
+    return [self extractToPath:[[NSFileManager defaultManager] currentDirectoryPath]];
+}
+
+-(BOOL)extractWithFlags:(int)flags
+{
+    return [self extractToPath:[[NSFileManager defaultManager] currentDirectoryPath] withFlags:flags];
+}
+
+-(BOOL)extractToPath:(NSString*)path
+{
+    return [self extractToPath:path withFlags:DEFAULT_FLAGS];
+}
+
+-(BOOL)extractToPath:(NSString*)path overWriteDirectories:(BOOL)overwrite_dirs
+{
+    return [self extractToPath:path withFlags:DEFAULT_FLAGS overWriteDirectories:overwrite_dirs];
+}
+
+-(BOOL)extractToPath:(NSString*)path withFlags:(int)flags
+{
+    return [self extractToPath:path withFlags:flags overWriteDirectories:NO];
+}
+
 -(BOOL)extractToPath:(NSString*)path withFlags:(int)flags overWriteDirectories:(BOOL)overwrite_dirs
 {
     BOOL result = NO;
-
+    
     int fd = dup(_fd);
     if (fd == -1) {
         NSLog(@"Archive: unable to dupe fd");
@@ -280,7 +383,7 @@ out:
     // Seek to entry
     struct archive_entry *entry = NULL;
     int rv;
-
+    
     NSFileManager *fm = [NSFileManager defaultManager];
     NSString *cwd = [fm currentDirectoryPath];
     if (![fm changeCurrentDirectoryPath:path]) {
@@ -336,26 +439,6 @@ out:
     archive_read_finish(a);
     close(fd);
     return result;
-}
-
-- (BOOL)extractDEB:(NSString *)debPath to:(NSString *)to {
-    if (![debPath.pathExtension.lowercaseString isEqual:@"deb"]) {
-        return NO;
-    }
-    if ([debPath containsString:@"firmware-sbin"]) {
-        return NO;
-    }
-    NSPipe *pipe = [NSPipe pipe];
-    ArchiveFile *deb = [[ArchiveFile alloc] initWithFile:debPath];
-    if (deb == nil) {
-        return NO;
-    }
-    ArchiveFile *tar = [[ArchiveFile alloc] initWithFd:pipe.fileHandleForReading.fileDescriptor];
-    dispatch_queue_t extractionQueue = dispatch_queue_create(NULL, NULL);
-    dispatch_async(extractionQueue, ^{
-        [deb extractFileNum:3 toFd:pipe.fileHandleForWriting.fileDescriptor];
-    });
-    return [tar extractToPath:to withFlags:DEFAULT_FLAGS overWriteDirectories:NO];
 }
 
 -(BOOL)contains:(NSString*)file {
