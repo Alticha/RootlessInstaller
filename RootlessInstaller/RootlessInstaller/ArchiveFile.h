@@ -9,15 +9,24 @@
 #define _ARCHIVE_FILE_H
 #import <Foundation/Foundation.h>
 #import "archive.h"
-#define DEFAULT_FLAGS (ARCHIVE_EXTRACT_TIME|ARCHIVE_EXTRACT_PERM|ARCHIVE_EXTRACT_ACL| \
-ARCHIVE_EXTRACT_FFLAGS|ARCHIVE_EXTRACT_OWNER|ARCHIVE_EXTRACT_UNLINK)
 
 @interface ArchiveFile : NSObject
--(ArchiveFile*)initWithFile:(NSString*)filename;
 @property (strong,readonly) NSArray <NSString*> *files;
+
++(ArchiveFile*)archiveWithFile:(NSString*)filename;
++(ArchiveFile*)archiveWithFd:(int)fd;
+-(ArchiveFile*)initWithFile:(NSString*)filename;
+-(ArchiveFile*)initWithFd:(int)fd;
 -(BOOL)contains:(NSString*)file;
+-(NSArray <NSString*> *)files;
+-(BOOL)extract;
+-(BOOL)extractFileNum:(int)fileNum toFd:(int)fd;
+-(BOOL)extract:(NSString*)file toPath:(NSString*)path;
+-(BOOL)extractWithFlags:(int)flags;
+-(BOOL)extractToPath:(NSString*)path;
+-(BOOL)extractToPath:(NSString*)path overWriteDirectories:(BOOL)overwrite_dirs;
+-(BOOL)extractToPath:(NSString*)path withFlags:(int)flags;
 -(BOOL)extractToPath:(NSString*)path withFlags:(int)flags overWriteDirectories:(BOOL)overwrite_dirs;
--(BOOL)extractDEB:(NSString *)debPath to:(NSString *)to;
 @end
 
 #endif /* _ARCHIVE_FILE_H */
