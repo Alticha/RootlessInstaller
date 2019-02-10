@@ -9,6 +9,10 @@
 #include "ArchiveFile.h"
 
 // definitions
+
+// REMOVE THE FLLOWING LINE TO ENABLE THE UNINSTALL FEATURE
+#define UNINSTALL_DEB_DISABLED
+
 #define hex(hex, alphaVal) [UIColor colorWithRed:((float)((hex & 0xFF0000) >> 16))/255.0 green:((float)((hex & 0xFF00) >> 8))/255.0 blue:((float)(hex & 0xFF))/255.0 alpha:alphaVal]
 #define isConnectedToInternet !([[Reachability reachabilityForInternetConnection] currentReachabilityStatus] == NotReachable)
 #define bgDisabledColour hex(0xB8B8B8, 1.0)
@@ -22,10 +26,12 @@
      posix_spawn(&_____PID_____, ARGS[0], NULL, NULL, (char **)&ARGS, NULL);\
      waitpid(_____PID_____, NULL, 0);\
 }
-#define retrn \
+#define retrn(why) \
 {\
-     [self dismissableController:@"Failed" text:nil];\
-     return;\
+    [[[Post alloc] init] mobile];\
+    [[[Post alloc] init] sandbox];\
+    [self dismissableController:@"Failed" text:@(why)];\
+    return;\
 }
 #define SYSTEM_VERSION_EQUAL_TO(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define SYSTEM_VERSION_GREATER_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
@@ -129,13 +135,19 @@ static NSString *Resources;
     return true;
 }
 
+- (bool)isUnsandboxed {
+    [[NSFileManager defaultManager] createFileAtPath:@"/var/TESTF" contents:nil attributes:nil];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:@"/var/TESTF"]) return false;
+    [[NSFileManager defaultManager] removeItemAtPath:@"/var/TESTF" error:nil];
+    return true;
+}
+
 - (IBAction)run_exploit:(id)sender {
     if (!(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"12.0") && SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"12.1.2"))) {
         [self undismissableController:@"Failed" text:@"Unfortunately, your iOS version is unsupported."];
         return;
     }
     
-    // SORRY - iSuperSU doesn't have an option to give root.
     if (![self voucher_swap]) {
         [self undismissableController:@"Failed" text:@"Unfortunately, your device is unsupported."];
         return;
@@ -154,12 +166,8 @@ static NSString *Resources;
     // install and trust ldid2
     if ([[NSFileManager defaultManager] fileExistsAtPath:ldid2]) unlink(ldid2.UTF8String);
     ArchiveFile *tar = [[ArchiveFile alloc] initWithFile:[Resources stringByAppendingString:@"/ldid2.tar.gz"]];
-    [tar extractToPath:ldid2.stringByDeletingLastPathComponent withFlags:DEFAULT_FLAGS overWriteDirectories:NO];
+    [tar extractToPath:ldid2.stringByDeletingLastPathComponent];
     [self trust:ldid2];
-    
-    // mobile & sandbox
-    [Utilities mobile];
-    [Utilities sandbox];
     
     // aaaand we're done
     [_rootbtn setEnabled:NO];
@@ -193,6 +201,28 @@ static NSString *Resources;
     [[NSFileManager defaultManager] removeItemAtPath:@"/var/LIB/patchTweaks.sh" error:nil];
 }
 
+//
+
+- (BOOL)extractDEB:(NSString *)debPath to:(NSString *)to {
+    if (![debPath.pathExtension.lowercaseString isEqual:@"deb"]) {
+        return NO;
+    }
+    if ([debPath containsString:@"firmware-sbin"]) {
+        return NO;
+    }
+    NSPipe *pipe = [NSPipe pipe];
+    ArchiveFile *deb = [[ArchiveFile alloc] initWithFile:debPath];
+    if (deb == nil) {
+        return NO;
+    }
+    ArchiveFile *tar = [ArchiveFile archiveWithFd:pipe.fileHandleForReading.fileDescriptor];
+    dispatch_queue_t extractionQueue = dispatch_queue_create(NULL, NULL);
+    dispatch_async(extractionQueue, ^{
+        [deb extractFileNum:3 toFd:pipe.fileHandleForWriting.fileDescriptor];
+    });
+    return [tar extractToPath:to];
+}
+
 // installer
 
 - (IBAction)installDEB:(id)sender {
@@ -200,52 +230,90 @@ static NSString *Resources;
     [Utilities root];
     [Utilities unsandbox];
     
-    // symlink /var/LIB/Library to /var/LIB/ so things install correctly
-    [[NSFileManager defaultManager] createSymbolicLinkAtPath:@"/var/LIB/Library" withDestinationPath:@"/var/LIB/" error:nil];
-    
     // download the DEB
     NSString *deb = [Resources stringByAppendingString:@"/DEB.deb"];
     NSURL *url = [NSURL URLWithString:_debURL.text];
-    if (![_debURL.text.pathExtension.lowercaseString isEqual:@"deb"]) retrn;
-    if (!url) retrn;
+    if (!_debURL.text) retrn("No URL was provided.");
+    if (![url.pathExtension.lowercaseString isEqual:@"deb"]) retrn(([NSString stringWithFormat:@"%@ files are unsupported.", url.pathExtension.uppercaseString]).UTF8String);
+    if (!url) retrn("No valid URL was provided.");
     NSData *data = [NSData dataWithContentsOfURL:url];
     if (data) {
         [data writeToFile:deb atomically:YES];
     } else {
-        retrn;
+        retrn("The DEB file couldn't be downloaded.");
     }
     
-    // checks
+    // so things install correctly
+    BOOL LIBRARY_EXISTS = false;
+    BOOL VAR_EXISTS = false;
+    BOOL PRIVATE_EXISTS = false;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:@"/var/Library"]) {
+        LIBRARY_EXISTS = true;
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/Library" toPath:@"/var/TMP_ROOTLESSINSTALLER_LIBRARY" error:nil];
+    }
+    if ([[NSFileManager defaultManager] fileExistsAtPath:@"/var/var"]) {
+        VAR_EXISTS = true;
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/var" toPath:@"/var/TMP_ROOTLESSINSTALLER_VAR" error:nil];
+    }
+    if ([[NSFileManager defaultManager] fileExistsAtPath:@"/var/private"]) {
+        PRIVATE_EXISTS = true;
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/private" toPath:@"/var/TMP_ROOTLESSINSTALLER_PRIVATE" error:nil];
+    }
+    
     {
         NSString *pkg = [Resources stringByAppendingString:@"/Package/"];
+        [[NSFileManager defaultManager] removeItemAtPath:pkg error:nil];
         mkdir(pkg.UTF8String, 0777);
         
-        [[[ArchiveFile alloc] init] extractDEB:deb to:[Resources stringByAppendingString:@"/Package/"]];
+        [self extractDEB:deb to:[Resources stringByAppendingString:@"/Package/"]];
         
         NSArray *arr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:pkg error:nil];
+        NSArray *root = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/" error:nil];
+        NSArray *whitelist = @[@"Library", @"var", @".DS_Store", @"private"];
         
-        if (arr.count == 1 || (arr.count == 2 && [arr containsObject:@".DS_Store"])) {
-            if (![arr containsObject:@"Library"]) {
+        for (int i = 0; i < arr.count; i++) {
+            if ([root containsObject:[arr objectAtIndex:i]] && ![whitelist containsObject:[arr objectAtIndex:i]]) {
+                NSLog(@"%@ %@ %@ %@", arr, root, whitelist, [arr objectAtIndex:i]);
                 [[NSFileManager defaultManager] removeItemAtPath:pkg error:nil];
-                retrn;
+                retrn("DEB failed to pass check 1.");
             }
-        } else {
-            [[NSFileManager defaultManager] removeItemAtPath:pkg error:nil];
-            retrn;
+            if ([[arr objectAtIndex:i] isEqual:@"private"]) {
+                NSArray *a = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[pkg stringByAppendingString:@"/private"] error:nil];
+                if (![a isEqual:@[@"var"]] && ![a isEqual:@[@".DS_Store", @"var"]]) {
+                    [[NSFileManager defaultManager] removeItemAtPath:pkg error:nil];
+                    retrn("DEB failed to pass check 2.");
+                }
+            }
         }
         
         [[NSFileManager defaultManager] removeItemAtPath:pkg error:nil];
     }
     
+    [[NSFileManager defaultManager] createSymbolicLinkAtPath:@"/var/Library" withDestinationPath:@"/var/LIB/" error:nil];
+    mkdir("/var/private", 0777);
+    [[NSFileManager defaultManager] createSymbolicLinkAtPath:@"/var/private/var" withDestinationPath:@"/var/" error:nil];
+    [[NSFileManager defaultManager] createSymbolicLinkAtPath:@"/var/var" withDestinationPath:@"/var/" error:nil];
+    
     // extract then delete the deb
-    [[[ArchiveFile alloc] init] extractDEB:deb to:@"/var/LIB"];
+    [self extractDEB:deb to:@"/var/"];
     unlink(deb.UTF8String);
     
     // patch tweaks so they work with rootlessJB
     [self patch];
     
     // remove our symlink
-    unlink("/var/LIB/Library");
+    unlink("/var/Library");
+    unlink("/var/var");
+    [[NSFileManager defaultManager] removeItemAtPath:@"/var/private" error:nil];
+    if (LIBRARY_EXISTS) {
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/TMP_ROOTLESSINSTALLER_LIBRARY" toPath:@"/var/Library" error:nil];
+    }
+    if (VAR_EXISTS) {
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/TMP_ROOTLESSINSTALLER_VAR" toPath:@"/var/var" error:nil];
+    }
+    if (LIBRARY_EXISTS) {
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/TMP_ROOTLESSINSTALLER_PRIVATE" toPath:@"/var/private" error:nil];
+    }
     
     // mobile & sandbox
     [Utilities mobile];
@@ -258,6 +326,7 @@ static NSString *Resources;
 // uninstaller
 
 - (IBAction)uninstallDEB:(id)sender {
+#ifndef UNINSTALL_DEB_DISABLED
     // root & unsandbox
     [Utilities root];
     [Utilities unsandbox];
@@ -265,34 +334,84 @@ static NSString *Resources;
     // download the DEB
     NSString *deb = [Resources stringByAppendingString:@"/DEB.deb"];
     NSURL *url = [NSURL URLWithString:_debURL.text];
-    if (![_debURL.text.pathExtension.lowercaseString isEqual:@"deb"]) retrn;
-    if (!url) retrn;
+    if (!_debURL.text) retrn("No URL was provided.");
+    if (![_debURL.text.pathExtension.lowercaseString isEqual:@"deb"]) retrn(([NSString stringWithFormat:@"%@ files are unsupported.", url.pathExtension.uppercaseString]).UTF8String);;
+    if (!url) retrn("No valid URL was provided.");
     NSData *data = [NSData dataWithContentsOfURL:url];
     if (data) {
         [data writeToFile:deb atomically:YES];
     } else {
-        retrn;
+        retrn("The DEB file couldn't be downloaded.");
     }
     
     // create Package in our app's bundle
     NSString *pkg = [Resources stringByAppendingString:@"/Package/"];
-    mkdir(pkg.UTF8String, 0777);
+    BOOL LIBRARY_EXISTS = false;
+    BOOL VAR_EXISTS = false;
+    BOOL PRIVATE_EXISTS = false;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:@"/var/Library"]) {
+        LIBRARY_EXISTS = true;
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/Library" toPath:@"/var/TMP_ROOTLESSINSTALLER_LIBRARY" error:nil];
+    }
+    if ([[NSFileManager defaultManager] fileExistsAtPath:@"/var/var"]) {
+        VAR_EXISTS = true;
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/var" toPath:@"/var/TMP_ROOTLESSINSTALLER_VAR" error:nil];
+    }
+    if ([[NSFileManager defaultManager] fileExistsAtPath:@"/var/private"]) {
+        PRIVATE_EXISTS = true;
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/private" toPath:@"/var/TMP_ROOTLESSINSTALLER_PRIVATE" error:nil];
+    }
+    
+    [[NSFileManager defaultManager] createSymbolicLinkAtPath:@"/var/Library" withDestinationPath:@"/var/LIB/" error:nil];
+    mkdir("/var/private", 0777);
+    [[NSFileManager defaultManager] createSymbolicLinkAtPath:@"/var/private/var" withDestinationPath:@"/var/" error:nil];
+    [[NSFileManager defaultManager] createSymbolicLinkAtPath:@"/var/var" withDestinationPath:@"/var/" error:nil];
+    
+    {
+        NSString *pkg = [Resources stringByAppendingString:@"/Package/"];
+        [[NSFileManager defaultManager] removeItemAtPath:pkg error:nil];
+        mkdir(pkg.UTF8String, 0777);
+        
+        [self extractDEB:deb to:[Resources stringByAppendingString:@"/Package/"]];
+        
+        NSArray *arr = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:pkg error:nil];
+        NSArray *root = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/" error:nil];
+        NSArray *whitelist = @[@"Library", @"var", @".DS_Store", @"private"];
+        
+        for (int i = 0; i < arr.count; i++) {
+            if ([root containsObject:[arr objectAtIndex:i]] && ![whitelist containsObject:[arr objectAtIndex:i]]) {
+                [[NSFileManager defaultManager] removeItemAtPath:pkg error:nil];
+                retrn("DEB failed to pass checks.");
+            }
+            if ([[arr objectAtIndex:i] isEqual:@"private"]) {
+                NSArray *a = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[pkg stringByAppendingString:@"/private"] error:nil];
+                if (![a isEqual:@[@"var"]] && ![a isEqual:@[@".DS_Store", @"var"]]) {
+                    [[NSFileManager defaultManager] removeItemAtPath:pkg error:nil];
+                    retrn("DEB failed to pass checks.");
+                }
+            }
+        }
+        
+        [[NSFileManager defaultManager] removeItemAtPath:pkg error:nil];
+    }
     
     // extract the DEB to Package then delete it
-    [[[ArchiveFile alloc] init] extractDEB:deb to:pkg];
+    mkdir(pkg.UTF8String, 0777);
+    [self extractDEB:deb to:pkg];
     unlink(deb.UTF8String);
     
     // get files in Package
-    NSString *sourcePath = [pkg stringByAppendingString:@"Library/"];
     NSMutableArray *files = [[NSMutableArray alloc] init];
-    NSURL *directoryURL = [NSURL URLWithString:sourcePath];
+    NSURL *directoryURL = [NSURL URLWithString:pkg];
     NSDirectoryEnumerator *enumerator = [[NSFileManager defaultManager] enumeratorAtURL:directoryURL includingPropertiesForKeys:@[NSURLIsDirectoryKey] options:0 errorHandler:^(NSURL *url, NSError *error) {
         return YES;
     }];
     for (NSURL *url in enumerator) {
-        NSString *path = [[url.path componentsSeparatedByString:@"/RootlessInstaller.app/Package/Library/"] lastObject];
-        path = [@"/var/LIB/" stringByAppendingString:path];
-        [files addObject:path];
+        NSString *path = [[url.path componentsSeparatedByString:@"/RootlessInstaller.app/Package/"] lastObject];
+        path = [@"/var/" stringByAppendingString:path];
+        BOOL isDir;
+        [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir];
+        if (!isDir) [files addObject:path];
     }
     
     // we're done with Package
@@ -300,8 +419,8 @@ static NSString *Resources;
     
     // remove the files in the DEB from the filesystem
     for (int i = 0; i < files.count; i++) {
-        NSArray *blacklist = @[@"/var/LIB/Library", @"/var/LIB/PreferenceLoader", @"/var/LIB/Frameworks", @"/var/LIB/MobileSubstrate", @"/var/LIB/MobileSubstrate/DynamicLibraries", @"/var/LIB/TweakInject", @"/var/LIB/LaunchDaemons", @"/var/LIB/PreferenceBundles", @"/var/LIB/PreferenceLoader/Preferences", @"/var/LIB/LaunchDaemons", @"/var/LIB/Frameworks", @"/var/LIB/TweakInject", @"/var/LIB", @"/var"];
-        NSString *to = (NSString *)[files objectAtIndex:i];
+        NSArray *blacklist = @[@"/private/var/containers/Bundle/tweaksupport/Library", @"/private/var/containers/Bundle/tweaksupport/Library/PreferenceLoader", @"/private/var/containers/Bundle/tweaksupport/Library/Frameworks", @"/private/var/containers/Bundle/tweaksupport/Library/MobileSubstrate", @"/private/var/containers/Bundle/tweaksupport/Library/MobileSubstrate/DynamicLibraries", @"/private/var/containers/Bundle/tweaksupport/Library/TweakInject", @"/private/var/containers/Bundle/tweaksupport/Library/LaunchDaemons", @"/private/var/containers/Bundle/tweaksupport/Library/PreferenceBundles", @"/private/var/containers/Bundle/tweaksupport/Library/PreferenceLoader/Preferences", @"/private/var/containers/Bundle/tweaksupport/Library/LaunchDaemons", @"/private/var/containers/Bundle/tweaksupport/Library/Frameworks", @"/private/var/containers/Bundle/tweaksupport/Library/TweakInject", @"/private/var/containers/Bundle/tweaksupport/Library", @"/private/var/LIB", @"/private/var", @"/private/var/mobile", @"/private/var/root", @"/private/var/containers/Bundle/tweaksupport/Library"];
+        NSString *to = @(realpath(((NSString *)[files objectAtIndex:i]).UTF8String, 0));
         
         // make sure we don't delete important things
         bool remove = true;
@@ -311,7 +430,42 @@ static NSString *Resources;
             }
         }
         
-        if (remove && [[NSFileManager defaultManager] fileExistsAtPath:to]) [[NSFileManager defaultManager] removeItemAtPath:to error:nil]; // delete the file/directory
+        if (remove && [[NSFileManager defaultManager] fileExistsAtPath:to]) unlink(to.UTF8String);
+        NSString *TO = [to.stringByDeletingLastPathComponent stringByAppendingString:@""];
+        NSLog(@"%@", TO);
+        while (true) {
+            if (remove && [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:TO error:nil] isEqual:@[]]) {
+                bool remove2 = true;
+                for (NSString *str in blacklist) {
+                    if ([TO isEqual:str] || [TO isEqual:[str stringByAppendingString:@"/"]]) {
+                        remove2 = false;
+                        break;
+                    }
+                }
+                if (remove2) {
+                    NSLog(@"removing: %@", TO);
+                    [[NSFileManager defaultManager] removeItemAtPath:TO error:nil];
+                    TO = TO.stringByDeletingLastPathComponent;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+    
+    unlink("/var/Library");
+    unlink("/var/var");
+    [[NSFileManager defaultManager] removeItemAtPath:@"/var/private" error:nil];
+    if (LIBRARY_EXISTS) {
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/TMP_ROOTLESSINSTALLER_LIBRARY" toPath:@"/var/Library" error:nil];
+    }
+    if (VAR_EXISTS) {
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/TMP_ROOTLESSINSTALLER_VAR" toPath:@"/var/var" error:nil];
+    }
+    if (LIBRARY_EXISTS) {
+        [[NSFileManager defaultManager] moveItemAtPath:@"/var/TMP_ROOTLESSINSTALLER_PRIVATE" toPath:@"/var/private" error:nil];
     }
     
     // idk fix a crash
@@ -324,6 +478,9 @@ static NSString *Resources;
     
     // success!
     [self dismissableController:@"Success" text:@"Removed tweak."];
+#else
+    [self dismissableController:@"Sorry" text:@"This feature has been temporarily disabled until I am certain it's safe.  If you want to test this or if you must use it, it can be enabled from the source code."];
+#endif
 }
 
 // respring
