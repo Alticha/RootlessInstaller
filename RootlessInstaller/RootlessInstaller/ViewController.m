@@ -115,7 +115,7 @@ static NSString *Resources;
     return YES;
 }
 
-// force keyboard to hide when users touch other place.
+// Dismiss keyboard when touching outside of UITextField.
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     [self.view endEditing:YES];
 }
