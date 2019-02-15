@@ -425,7 +425,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4WR2S8GS5M;
+				DEVELOPMENT_TEAM = V693F8XLRG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -440,7 +440,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/RootlessInstaller",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = alticha.RootlessInstaller;
+				PRODUCT_BUNDLE_IDENTIFIER = "-float.RootlessInstaller";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -451,7 +451,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4WR2S8GS5M;
+				DEVELOPMENT_TEAM = V693F8XLRG;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -466,7 +466,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/RootlessInstaller",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = alticha.RootlessInstaller;
+				PRODUCT_BUNDLE_IDENTIFIER = "-float.RootlessInstaller";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

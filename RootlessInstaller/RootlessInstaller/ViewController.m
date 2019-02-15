@@ -108,11 +108,17 @@ static NSString *Resources;
     [self presentViewController:alert animated:YES completion:nil];
 }
 
+#pragma mark - UITextFieldDelegate
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];
     return YES;
 }
 
+// force keyboard to hide when users touch other place.
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    [self.view endEditing:YES];
+}
 // exploitation etc
 
 - (bool)isJailbroken {
