@@ -1,0 +1,425 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E002CC6F22186CA700E13A87 /* ent.xml in Resources */ = {isa = PBXBuildFile; fileRef = E002CC6E22186C8B00E13A87 /* ent.xml */; };
+		E003589422189DE5002A6853 /* jbd.c in Sources */ = {isa = PBXBuildFile; fileRef = E003589322189DE5002A6853 /* jbd.c */; };
+		E05B9A38220B31D700DDE972 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E05B9A37220B31D700DDE972 /* AppDelegate.m */; };
+		E05B9A3B220B31D700DDE972 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E05B9A3A220B31D700DDE972 /* ViewController.m */; };
+		E05B9A40220B31DB00DDE972 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E05B9A3F220B31DB00DDE972 /* Assets.xcassets */; };
+		E05B9A46220B31DB00DDE972 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E05B9A45220B31DB00DDE972 /* main.m */; };
+		E05BA0EA220B6A2E00DDE972 /* ArchiveFile.m in Sources */ = {isa = PBXBuildFile; fileRef = E05BA0E8220B6A2D00DDE972 /* ArchiveFile.m */; };
+		E05BA0F0220B6DC800DDE972 /* libarchive.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E05BA0EF220B6DC800DDE972 /* libarchive.2.tbd */; };
+		E06C63CC220E1F8300B6679C /* patch.sh in Resources */ = {isa = PBXBuildFile; fileRef = E06C63CB220E1F8300B6679C /* patch.sh */; };
+		E0E3DD13220F6B24002777B8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0E3DD12220F6B24002777B8 /* Main.storyboard */; };
+		E0E3DD15220F6B28002777B8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0E3DD14220F6B28002777B8 /* LaunchScreen.storyboard */; };
+		E0E3DD17220F7B4B002777B8 /* ldid2.tar.gz in Resources */ = {isa = PBXBuildFile; fileRef = E0E3DD16220F7B4B002777B8 /* ldid2.tar.gz */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E06C63D5220E428800B6679C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		E002CC6E22186C8B00E13A87 /* ent.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ent.xml; sourceTree = "<group>"; };
+		E003589222189DE5002A6853 /* jbd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jbd.h; sourceTree = "<group>"; };
+		E003589322189DE5002A6853 /* jbd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jbd.c; sourceTree = "<group>"; };
+		E003589522189ED3002A6853 /* install.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
+		E05B9A33220B31D700DDE972 /* RootlessInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RootlessInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E05B9A36220B31D700DDE972 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		E05B9A37220B31D700DDE972 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		E05B9A3A220B31D700DDE972 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		E05B9A3F220B31DB00DDE972 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E05B9A44220B31DB00DDE972 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E05B9A45220B31DB00DDE972 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E05B9ABA220B571A00DDE972 /* ipc_port.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ipc_port.h; sourceTree = "<group>"; };
+		E05B9ABB220B571A00DDE972 /* IOKitLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IOKitLib.h; sourceTree = "<group>"; };
+		E05B9ABC220B571A00DDE972 /* mach_vm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mach_vm.h; sourceTree = "<group>"; };
+		E05BA0E8220B6A2D00DDE972 /* ArchiveFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ArchiveFile.m; sourceTree = "<group>"; };
+		E05BA0E9220B6A2D00DDE972 /* ArchiveFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArchiveFile.h; sourceTree = "<group>"; };
+		E05BA0EF220B6DC800DDE972 /* libarchive.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.2.tbd; path = usr/lib/libarchive.2.tbd; sourceTree = SDKROOT; };
+		E05BA0F2220B6E1000DDE972 /* archive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = archive.h; sourceTree = "<group>"; };
+		E05BA0F3220B6E1000DDE972 /* archive_entry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = archive_entry.h; sourceTree = "<group>"; };
+		E06C63CB220E1F8300B6679C /* patch.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = patch.sh; sourceTree = "<group>"; };
+		E0E3DD12220F6B24002777B8 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		E0E3DD14220F6B28002777B8 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E0E3DD16220F7B4B002777B8 /* ldid2.tar.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = ldid2.tar.gz; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E05B9A30220B31D700DDE972 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E05BA0F0220B6DC800DDE972 /* libarchive.2.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E05B9A2A220B31D700DDE972 = {
+			isa = PBXGroup;
+			children = (
+				E05B9AB9220B571A00DDE972 /* headers */,
+				E05B9A35220B31D700DDE972 /* RootlessInstaller */,
+				E05B9A34220B31D700DDE972 /* Products */,
+				E05BA0EE220B6DC700DDE972 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		E05B9A34220B31D700DDE972 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E05B9A33220B31D700DDE972 /* RootlessInstaller.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E05B9A35220B31D700DDE972 /* RootlessInstaller */ = {
+			isa = PBXGroup;
+			children = (
+				E0E3DD11220F5ED9002777B8 /* GUI */,
+				E0E3DD0E220F5EB2002777B8 /* resources */,
+				E05BA0E9220B6A2D00DDE972 /* ArchiveFile.h */,
+				E05BA0E8220B6A2D00DDE972 /* ArchiveFile.m */,
+				E05B9A36220B31D700DDE972 /* AppDelegate.h */,
+				E05B9A37220B31D700DDE972 /* AppDelegate.m */,
+				E05B9A3A220B31D700DDE972 /* ViewController.m */,
+				E003589522189ED3002A6853 /* install.sh */,
+				E05B9A45220B31DB00DDE972 /* main.m */,
+				E003589322189DE5002A6853 /* jbd.c */,
+				E003589222189DE5002A6853 /* jbd.h */,
+				E05B9A44220B31DB00DDE972 /* Info.plist */,
+			);
+			path = RootlessInstaller;
+			sourceTree = "<group>";
+		};
+		E05B9AB9220B571A00DDE972 /* headers */ = {
+			isa = PBXGroup;
+			children = (
+				E05B9ABA220B571A00DDE972 /* ipc_port.h */,
+				E05B9ABB220B571A00DDE972 /* IOKitLib.h */,
+				E05B9ABC220B571A00DDE972 /* mach_vm.h */,
+				E05BA0F2220B6E1000DDE972 /* archive.h */,
+				E05BA0F3220B6E1000DDE972 /* archive_entry.h */,
+			);
+			path = headers;
+			sourceTree = "<group>";
+		};
+		E05BA0EE220B6DC700DDE972 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E05BA0EF220B6DC800DDE972 /* libarchive.2.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E0E3DD0E220F5EB2002777B8 /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				E0E3DD16220F7B4B002777B8 /* ldid2.tar.gz */,
+				E06C63CB220E1F8300B6679C /* patch.sh */,
+				E002CC6E22186C8B00E13A87 /* ent.xml */,
+			);
+			name = resources;
+			sourceTree = "<group>";
+		};
+		E0E3DD11220F5ED9002777B8 /* GUI */ = {
+			isa = PBXGroup;
+			children = (
+				E0E3DD12220F6B24002777B8 /* Main.storyboard */,
+				E0E3DD14220F6B28002777B8 /* LaunchScreen.storyboard */,
+				E05B9A3F220B31DB00DDE972 /* Assets.xcassets */,
+			);
+			name = GUI;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E05B9A32220B31D700DDE972 /* RootlessInstaller */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E05B9A49220B31DB00DDE972 /* Build configuration list for PBXNativeTarget "RootlessInstaller" */;
+			buildPhases = (
+				E05B9A2F220B31D700DDE972 /* Sources */,
+				E05B9A30220B31D700DDE972 /* Frameworks */,
+				E05B9A31220B31D700DDE972 /* Resources */,
+				E06C63D5220E428800B6679C /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RootlessInstaller;
+			productName = RootlessInstaller;
+			productReference = E05B9A33220B31D700DDE972 /* RootlessInstaller.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E05B9A2B220B31D700DDE972 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = Alticha;
+				TargetAttributes = {
+					E05B9A32220B31D700DDE972 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+				};
+			};
+			buildConfigurationList = E05B9A2E220B31D700DDE972 /* Build configuration list for PBXProject "RootlessInstaller" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E05B9A2A220B31D700DDE972;
+			productRefGroup = E05B9A34220B31D700DDE972 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E05B9A32220B31D700DDE972 /* RootlessInstaller */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E05B9A31220B31D700DDE972 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E002CC6F22186CA700E13A87 /* ent.xml in Resources */,
+				E06C63CC220E1F8300B6679C /* patch.sh in Resources */,
+				E0E3DD17220F7B4B002777B8 /* ldid2.tar.gz in Resources */,
+				E0E3DD13220F6B24002777B8 /* Main.storyboard in Resources */,
+				E0E3DD15220F6B28002777B8 /* LaunchScreen.storyboard in Resources */,
+				E05B9A40220B31DB00DDE972 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E05B9A2F220B31D700DDE972 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E05BA0EA220B6A2E00DDE972 /* ArchiveFile.m in Sources */,
+				E003589422189DE5002A6853 /* jbd.c in Sources */,
+				E05B9A3B220B31D700DDE972 /* ViewController.m in Sources */,
+				E05B9A46220B31DB00DDE972 /* main.m in Sources */,
+				E05B9A38220B31D700DDE972 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		E05B9A47220B31DB00DDE972 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		E05B9A48220B31DB00DDE972 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E05B9A4A220B31DB00DDE972 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4WR2S8GS5M;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = RootlessInstaller/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RootlessInstaller",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.alticha.RootlessInstaller;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E05B9A4B220B31DB00DDE972 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 4WR2S8GS5M;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = RootlessInstaller/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/RootlessInstaller",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.alticha.RootlessInstaller;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E05B9A2E220B31D700DDE972 /* Build configuration list for PBXProject "RootlessInstaller" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E05B9A47220B31DB00DDE972 /* Debug */,
+				E05B9A48220B31DB00DDE972 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E05B9A49220B31DB00DDE972 /* Build configuration list for PBXNativeTarget "RootlessInstaller" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E05B9A4A220B31DB00DDE972 /* Debug */,
+				E05B9A4B220B31DB00DDE972 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E05B9A2B220B31D700DDE972 /* Project object */;
+}
