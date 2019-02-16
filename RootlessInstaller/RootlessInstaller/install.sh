@@ -18,7 +18,4 @@ chown root $ROOTLESSINSTALLER
 chmod 6755 $ROOTLESSINSTALLER
 # Finished
 echo "Installed RootlessInstaller!"
-echo "Every time you jailbreak, you'll have to run the following command:"
-echo "inject $ROOTLESSINSTALLER"
-echo "to prevent the application from crashing until rootlessJB is updated with a fix for this bug."
 echo "Enjoy! :-)"
