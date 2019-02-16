@@ -2,24 +2,17 @@
 #include <spawn.h>
 #include <sys/sysctl.h>
 #include <sys/stat.h>
-#include "kernel_memory.h"
 #include <sys/utsname.h>
-#include "post.h"
-#include "voucher_swap.h"
 #include "ArchiveFile.h"
+#include "jbd.h"
 
 // definitions
-
-// REMOVE THE FLLOWING LINE TO ENABLE THE UNINSTALL FEATURE
-#define UNINSTALL_DEB_DISABLED
-
 #define hex(hex, alphaVal) [UIColor colorWithRed:((float)((hex & 0xFF0000) >> 16))/255.0 green:((float)((hex & 0xFF00) >> 8))/255.0 blue:((float)(hex & 0xFF))/255.0 alpha:alphaVal]
 #define isConnectedToInternet !([[Reachability reachabilityForInternetConnection] currentReachabilityStatus] == NotReachable)
 #define bgDisabledColour hex(0xB8B8B8, 1.0)
 #define setBgDisabledColour setBackgroundColor:hex(0xB8B8B8, 1.0)
 #define bgEnabledColour [UIColor colorWithRed:1 green:0.57637232540000005 blue:0 alpha:1]
 #define setBgEnabledColour setBackgroundColor:[UIColor colorWithRed:1 green:0.57637232540000005 blue:0 alpha:1]
-#define Utilities [[Post alloc] init]
 #define execute(ARGS) \
 {\
      pid_t _____PID_____;\
@@ -28,8 +21,6 @@
 }
 #define retrn(why) \
 {\
-    [[[Post alloc] init] mobile];\
-    [[[Post alloc] init] sandbox];\
     [self dismissableController:@"Failed" text:@(why)];\
     return;\
 }
@@ -108,36 +99,52 @@ static NSString *Resources;
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-#pragma mark - UITextFieldDelegate
-
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];
     return YES;
 }
 
-// Dismiss keyboard when touching outside of UITextField.
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     [self.view endEditing:YES];
 }
+
 // exploitation etc
+
+- (pid_t)pid_for_name:(NSString *)name {
+    static int maxArgumentSize = 0;
+    size_t size = sizeof(maxArgumentSize);
+    sysctl((int[]){ CTL_KERN, KERN_ARGMAX }, 2, &maxArgumentSize, &size, NULL, 0);
+    int mib[3] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL };
+    struct kinfo_proc *info;
+    size_t length;
+    sysctl(mib, 3, NULL, &length, NULL, 0);
+    info = malloc(length);
+    sysctl(mib, 3, info, &length, NULL, 0);
+    for (int i = 0; i < length / sizeof(struct kinfo_proc); i++) {
+        pid_t pid = info[i].kp_proc.p_pid;
+        if (pid == 0) {
+            continue;
+        }
+        size_t size = maxArgumentSize;
+        char *buffer = (char *)malloc(length);
+        sysctl((int[]){ CTL_KERN, KERN_PROCARGS2, pid }, 3, buffer, &size, NULL, 0);
+        NSString *executable = [NSString stringWithCString:buffer + sizeof(int) encoding:NSUTF8StringEncoding];
+        free(buffer);
+        if ([executable isEqual:name]) {
+            free(info);
+            return pid;
+        } else if ([[executable lastPathComponent] isEqual:name]) {
+            free(info);
+            return pid;
+        }
+    }
+    free(info);
+    return -1;
+}
 
 - (bool)isJailbroken {
     if (![[NSFileManager defaultManager] fileExistsAtPath:@"/var/LIB/"]) return false;
-    if ([Utilities pid_for_name:@"/var/containers/Bundle/iosbinpack64/bin/jailbreakd"] == -1) return false;
-    return true;
-}
-
-- (bool)voucher_swap {
-    if (![Utilities is16KAndIsNotA12]) {
-        printf("non-16k and a12 devices are unsupported.\n");
-        return false;
-    }
-    // Run voucher_swap
-    voucher_swap();
-    if (!MACH_PORT_VALID(kernel_task_port)) {
-        // Failed
-        return false;
-    }
+    if ([self pid_for_name:@"/var/containers/Bundle/iosbinpack64/bin/jailbreakd"] == -1) return false;
     return true;
 }
 
@@ -148,25 +155,29 @@ static NSString *Resources;
     return true;
 }
 
-- (IBAction)run_exploit:(id)sender {
+- (IBAction)run_exploit:(id)sender { // cba renaming leave me alone
     if (!(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"12.0") && SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"12.1.2"))) {
         [self undismissableController:@"Failed" text:@"Unfortunately, your iOS version is unsupported."];
         return;
     }
     
-    if (![self voucher_swap]) {
-        [self undismissableController:@"Failed" text:@"Unfortunately, your device is unsupported."];
-        return;
-    }
-    
-    // Basic post-exploitation
-    [Utilities go];
-    
-    if (![self isJailbroken]) {
-        [Utilities mobile];
-        [Utilities sandbox];
-        [self undismissableController:@"Failed" text:@"Please jailbreak with rootlessJB."];
-        return;
+    calljailbreakd(getpid(), 6);
+    calljailbreakd(getpid(), 7);
+    static int tries = 0;
+    sleep(1);
+    setuid(0);
+    seteuid(0);
+    setgid(0);
+    setegid(0);
+    if (![self isUnsandboxed] || getuid()) {
+        if (tries < 10) {
+            tries++;
+            [self run_exploit:sender];
+            return;
+        } else {
+            [self dismissableController:@"Error" text:@"RootlessInstaller hasn't been installed properly. To correct this, SSH into your device and run the following command:\nsh \"$(find /var/containers/Bundle/Application | grep RootlessInstaller.app/install.sh)\""];
+            return;
+        }
     }
     
     // install and trust ldid2
@@ -232,10 +243,6 @@ static NSString *Resources;
 // installer
 
 - (IBAction)installDEB:(id)sender {
-    // root & unsandbox
-    [Utilities root];
-    [Utilities unsandbox];
-    
     // download the DEB
     NSString *deb = [Resources stringByAppendingString:@"/DEB.deb"];
     NSURL *url = [NSURL URLWithString:_debURL.text];
@@ -321,10 +328,6 @@ static NSString *Resources;
         [[NSFileManager defaultManager] moveItemAtPath:@"/var/TMP_ROOTLESSINSTALLER_PRIVATE" toPath:@"/var/private" error:nil];
     }
     
-    // mobile & sandbox
-    [Utilities mobile];
-    [Utilities sandbox];
-    
     // success!
     [self dismissableController:@"Success" text:@"Installed tweak."];
 }
@@ -332,11 +335,17 @@ static NSString *Resources;
 // uninstaller
 
 - (IBAction)uninstallDEB:(id)sender {
-#ifndef UNINSTALL_DEB_DISABLED
-    // root & unsandbox
-    [Utilities root];
-    [Utilities unsandbox];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Sorry" message:@"This feature has been temporarily disabled until I'm certain it's safe.  If you really must use this or if you'd like to test, tap the Ignore button below." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *ignore = [UIAlertAction actionWithTitle:@"Ignore" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        [self reallyUninstallDEB];
+    }];
+    [alert addAction:dismiss];
+    [alert addAction:ignore];
+    [self presentViewController:alert animated:YES completion:nil];
+}
     
+- (void)reallyUninstallDEB {
     // download the DEB
     NSString *deb = [Resources stringByAppendingString:@"/DEB.deb"];
     NSURL *url = [NSURL URLWithString:_debURL.text];
@@ -474,26 +483,15 @@ static NSString *Resources;
         [[NSFileManager defaultManager] moveItemAtPath:@"/var/TMP_ROOTLESSINSTALLER_PRIVATE" toPath:@"/var/private" error:nil];
     }
     
-    // idk fix a crash
-    chmod([Resources stringByAppendingString:@"/RootlessInstaller"].UTF8String, 0755);
-    chown([Resources stringByAppendingString:@"/RootlessInstaller"].UTF8String, 33, 33);
-    
-    // mobile & sandbox
-    [Utilities mobile];
-    [Utilities sandbox];
-    
     // success!
     [self dismissableController:@"Success" text:@"Removed tweak."];
-#else
-    [self dismissableController:@"Sorry" text:@"This feature has been temporarily disabled until I am certain it's safe.  If you want to test this or if you must use it, it can be enabled from the source code."];
-#endif
 }
 
 // respring
 
 - (IBAction)respring:(id)sender {
-    // pretty simple; unsandbox and SIGTERM SpringBoard
-    [Utilities respring];
+    // pretty simple; find SpringBoard's PID and SIGTERM it
+    kill([self pid_for_name:@"/System/Library/CoreServices/SpringBoard.app/SpringBoard"], SIGTERM);
 }
 
 @end

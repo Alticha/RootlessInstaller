@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E002CC6F22186CA700E13A87 /* ent.xml in Resources */ = {isa = PBXBuildFile; fileRef = E002CC6E22186C8B00E13A87 /* ent.xml */; };
 		E003589422189DE5002A6853 /* jbd.c in Sources */ = {isa = PBXBuildFile; fileRef = E003589322189DE5002A6853 /* jbd.c */; };
+		E00358972218AC5F002A6853 /* install.sh in Resources */ = {isa = PBXBuildFile; fileRef = E00358962218AC5F002A6853 /* install.sh */; };
 		E05B9A38220B31D700DDE972 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E05B9A37220B31D700DDE972 /* AppDelegate.m */; };
 		E05B9A3B220B31D700DDE972 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E05B9A3A220B31D700DDE972 /* ViewController.m */; };
 		E05B9A40220B31DB00DDE972 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E05B9A3F220B31DB00DDE972 /* Assets.xcassets */; };
@@ -38,6 +39,7 @@
 		E002CC6E22186C8B00E13A87 /* ent.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ent.xml; sourceTree = "<group>"; };
 		E003589222189DE5002A6853 /* jbd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jbd.h; sourceTree = "<group>"; };
 		E003589322189DE5002A6853 /* jbd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jbd.c; sourceTree = "<group>"; };
+		E00358962218AC5F002A6853 /* install.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install.sh; sourceTree = "<group>"; };
 		E05B9A33220B31D700DDE972 /* RootlessInstaller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RootlessInstaller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E05B9A36220B31D700DDE972 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E05B9A37220B31D700DDE972 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 		E0E3DD0E220F5EB2002777B8 /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				E00358962218AC5F002A6853 /* install.sh */,
 				E0E3DD16220F7B4B002777B8 /* ldid2.tar.gz */,
 				E06C63CB220E1F8300B6679C /* patch.sh */,
 				E002CC6E22186C8B00E13A87 /* ent.xml */,
@@ -206,6 +209,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E002CC6F22186CA700E13A87 /* ent.xml in Resources */,
+				E00358972218AC5F002A6853 /* install.sh in Resources */,
 				E06C63CC220E1F8300B6679C /* patch.sh in Resources */,
 				E0E3DD17220F7B4B002777B8 /* ldid2.tar.gz in Resources */,
 				E0E3DD13220F6B24002777B8 /* Main.storyboard in Resources */,

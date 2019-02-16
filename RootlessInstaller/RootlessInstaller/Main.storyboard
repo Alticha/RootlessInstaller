@@ -65,7 +65,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Ahd-yP-QbW"/>
                                 </constraints>
-                                <string key="text">Alticha - version 1.0.1
+                                <string key="text">Alticha - version 1.0.2
 this is strictly for tweaks</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -78,7 +78,7 @@ this is strictly for tweaks</string>
                                     <constraint firstAttribute="height" constant="50" id="sh6-Yc-OzY"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                <state key="normal" title="Exploit">
+                                <state key="normal" title="Get root">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
