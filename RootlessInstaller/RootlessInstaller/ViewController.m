@@ -156,7 +156,7 @@ static NSString *Resources;
 }
 
 - (IBAction)run_exploit:(id)sender { // cba renaming leave me alone
-    if (!(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"12.0") && SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"12.1.2"))) {
+    if (!(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"12.0") && SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"12.4"))) {
         [self undismissableController:@"Failed" text:@"Unfortunately, your iOS version is unsupported."];
         return;
     }
